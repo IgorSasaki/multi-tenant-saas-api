@@ -24,7 +24,7 @@ export default [
   {
     files: ['**/*.js'],
     rules: {
-      'camelcase': 'off',
+      camelcase: 'off',
       'space-before-function-paren': 'off'
     }
   },
@@ -45,12 +45,7 @@ export default [
         'warn',
         {
           newlinesBetween: 'always',
-          groups: [
-            'module',
-            '/^@prisma/',
-            '/^@/',
-            ['parent', 'sibling', 'index']
-          ],
+          groups: ['module', '/^@prisma/', '/^@/', ['parent', 'sibling', 'index']],
           alphabetize: { order: 'asc', ignoreCase: true }
         }
       ],
@@ -92,8 +87,14 @@ export default [
   {
     rules: {
       'no-useless-constructor': 'off',
-      'no-use-before-define': 'off',
-      'no-console': ['warn', { allow: ['warn', 'error'] }]
+      'no-use-before-define': 'off'
+    }
+  },
+  // Exceção para arquivos de config e seed (permite console.log)
+  {
+    files: ['src/server.ts', 'prisma/seed.ts', 'prisma.config.ts'],
+    rules: {
+      'no-console': 'off'
     }
   },
   {
@@ -113,7 +114,14 @@ export default [
       '@typescript-eslint/no-empty-interface': 'off',
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/no-misused-promises': [
+        'error',
+        {
+          checksVoidReturn: {
+            arguments: false
+          }
+        }
+      ],
       '@typescript-eslint/await-thenable': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',
