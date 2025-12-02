@@ -9,9 +9,7 @@ export const authMiddleware = async (
   next: NextFunction
 ) => {
   try {
-    // Get token from cookie or Authorization header
-    const token =
-      req.cookies?.token || req.headers.authorization?.replace('Bearer ', '')
+    const token = req.cookies?.token
 
     if (!token) {
       return res

@@ -16,10 +16,10 @@ export const createApp = () => {
   app.use(express.json())
   app.use(helmet())
   app.use(cookieParser())
-  app.use(cors({ origin: env.corsOrigin }))
+  app.use(cors({ credentials: true, origin: env.corsOrigin }))
   app.use(rateLimit({ max: 100, windowMs: 60_000 }))
 
-  app.get('/', (_req, res) => res.json({ ok: true }))
+  app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
   app.use('/api', authRoutes)
   app.use('/api', companyRoutes)

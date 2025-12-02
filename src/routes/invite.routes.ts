@@ -9,6 +9,7 @@ import { UserRepository } from '@/repositories/user.repository'
 import { AcceptInviteUseCase } from '@/use-cases/invite/accept-invite.use-case'
 import { CancelInviteUseCase } from '@/use-cases/invite/cancel-invite.use-case'
 import { CreateInviteUseCase } from '@/use-cases/invite/create-invite.use-case'
+import { GetInviteByTokenUseCase } from '@/use-cases/invite/get-invite-by-token.use-case'
 import { ListCompanyInvitesUseCase } from '@/use-cases/invite/list-company-invites.use-case'
 
 const inviteRoutes = Router()
@@ -23,44 +24,55 @@ const createInviteUseCase = new CreateInviteUseCase(
   companyRepository,
   membershipRepository
 )
+
 const acceptInviteUseCase = new AcceptInviteUseCase(
   inviteRepository,
   membershipRepository,
-  userRepository,
-  companyRepository
+  userRepository
 )
+
 const listCompanyInvitesUseCase = new ListCompanyInvitesUseCase(
   inviteRepository,
   companyRepository,
   membershipRepository
 )
+
 const cancelInviteUseCase = new CancelInviteUseCase(
   inviteRepository,
   companyRepository,
   membershipRepository
 )
 
+const getInviteByTokenUseCase = new GetInviteByTokenUseCase(inviteRepository)
+
 const inviteController = new InviteController(
   createInviteUseCase,
   acceptInviteUseCase,
   listCompanyInvitesUseCase,
-  cancelInviteUseCase
+  cancelInviteUseCase,
+  getInviteByTokenUseCase
 )
 
 // Protected routes (require auth)
 inviteRoutes.post('/company/:companyId/invite', authMiddleware, (req, res) =>
   inviteController.create(req, res)
 )
+
 inviteRoutes.get('/company/:companyId/invites', authMiddleware, (req, res) =>
   inviteController.list(req, res)
 )
+
 inviteRoutes.delete(
   '/company/:companyId/invite/:token',
   authMiddleware,
   (req, res) => inviteController.cancel(req, res)
 )
 
-// Public route (no auth required)
+// Public routes (no auth required)
+inviteRoutes.get('/invite/:token', (req, res) =>
+  inviteController.getByToken(req, res)
+)
+
 inviteRoutes.post('/invite/:token/accept', (req, res) =>
   inviteController.accept(req, res)
 )

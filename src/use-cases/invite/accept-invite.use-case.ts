@@ -21,20 +21,22 @@ export class AcceptInviteUseCase {
   ) {}
 
   async execute(data: AcceptInviteDTO): Promise<{
-    company: {
-      id: string
-      logoUrl: string | null
-      name: string
-    }
     user: {
       id: string
-      email: string
       name: string
+      email: string
     }
+    company: {
+      id: string
+      name: string
+      logoUrl: string | null
+    }
+    requiresLogin?: boolean
   }> {
     const { name, password, token, userId } = data
 
     const invite = await this.inviteRepository.findByTokenWithCompany(token)
+
     if (!invite) {
       throw new InviteNotFoundError(token)
     }
@@ -51,6 +53,7 @@ export class AcceptInviteUseCase {
 
     if (userId) {
       user = await this.userRepository.findById(userId)
+
       if (!user) {
         throw new UserNotFoundError(userId)
       }
@@ -64,23 +67,35 @@ export class AcceptInviteUseCase {
           userId,
           invite.companyId
         )
+
       if (existingMembership) {
         throw new UserAlreadyMemberError()
       }
     } else {
+      const existingUser = await this.userRepository.findByEmail(invite.email)
+
+      if (existingUser) {
+        return {
+          company: {
+            id: invite.company.id,
+            logoUrl: invite.company.logoUrl,
+            name: invite.company.name
+          },
+          requiresLogin: true,
+          user: {
+            email: existingUser.email,
+            id: existingUser.id,
+            name: existingUser.name
+          }
+        }
+      }
+
       if (!name || !password) {
         throw new Error('Name and password are required for new users')
       }
 
       if (password.length < 8) {
         throw new Error('Password must be at least 8 characters long')
-      }
-
-      const existingUser = await this.userRepository.findByEmail(invite.email)
-      if (existingUser) {
-        throw new Error(
-          'User with this email already exists. Please login first.'
-        )
       }
 
       const passwordHash = await bcrypt.hash(password, 10)

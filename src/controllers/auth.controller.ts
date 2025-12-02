@@ -21,21 +21,20 @@ export class AuthController {
         password
       })
 
-      // Generate JWT
       const token = JWTUtil.sign({
         email: user.email,
         sub: user.id
       })
 
-      // Set httpOnly cookie
       res.cookie('token', token, {
         httpOnly: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/',
+        sameSite: 'lax',
         secure: env.nodeEnv === 'production'
       })
 
-      return res.status(201).json({ token, user })
+      return res.status(201).json({ user })
     } catch (error) {
       if (error instanceof Error) {
         return res.status(400).json({ message: error.message })
@@ -53,21 +52,20 @@ export class AuthController {
         password
       })
 
-      // Generate JWT
       const token = JWTUtil.sign({
         email: user.email,
         sub: user.id
       })
 
-      // Set httpOnly cookie
       res.cookie('token', token, {
         httpOnly: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/',
+        sameSite: 'lax',
         secure: env.nodeEnv === 'production'
       })
 
-      return res.status(200).json({ token, user })
+      return res.status(200).json({ user })
     } catch (error) {
       if (error instanceof Error) {
         return res.status(401).json({ message: error.message })
@@ -77,7 +75,12 @@ export class AuthController {
   }
 
   async logout(_req: Request, res: Response) {
-    res.clearCookie('token')
+    res.clearCookie('token', {
+      httpOnly: true,
+      path: '/',
+      sameSite: 'lax',
+      secure: env.nodeEnv === 'production'
+    })
     return res.status(200).json({ message: 'Logged out successfully' })
   }
 
