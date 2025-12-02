@@ -7,6 +7,7 @@ import helmet from 'helmet'
 import { env } from './config/env.js'
 import { authRoutes } from './routes/auth.routes.js'
 import { companyRoutes } from './routes/company.routes.js'
+import { inviteRoutes } from './routes/invite.routes.js'
 import { membershipRoutes } from './routes/membership.routes.js'
 
 export const createApp = () => {
@@ -23,6 +24,7 @@ export const createApp = () => {
   app.use('/api', authRoutes)
   app.use('/api', companyRoutes)
   app.use('/api', membershipRoutes)
+  app.use('/api', inviteRoutes)
 
   return app
 }
