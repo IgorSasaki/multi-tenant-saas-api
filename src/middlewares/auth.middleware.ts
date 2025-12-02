@@ -34,7 +34,7 @@ export const authMiddleware = async (
     const { passwordHash: _, ...userWithoutPassword } = user
     req.user = userWithoutPassword
 
-    next()
+    return next()
   } catch (error) {
     if (error instanceof Error) {
       return res.status(401).json({ message: error.message })
